@@ -1,4 +1,4 @@
-# vue_pc_demo
+# vue_pc_demo client
 
 ## Project setup
 ```
