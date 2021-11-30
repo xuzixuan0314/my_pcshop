@@ -9,7 +9,6 @@
 <script>
 import Header from './components/Header'
 import Footer from './components/Footer'
-import {getCategoryList} from './api'
 export default {
   name: 'App',
   mounted(){
@@ -17,7 +16,9 @@ export default {
     // getCategoryList().then(result=>{
     //   console.log(result)
     // })
-    this.$store.dispatch('getCategroyList')
+    this.$store.dispatch('getCategoryList'),
+    // 在App中发送请求，看是否需要多次发送请求，在App中只需要发一次请求就可以了
+    this.$store.dispatch('getBannerList')
   },
   components:{
     Header,

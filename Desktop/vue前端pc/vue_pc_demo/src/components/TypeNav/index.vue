@@ -1,7 +1,36 @@
 <template>
   <div class="type-nav">
     <div class="container">
-      <h2 class="all">全部商品分类</h2>
+      <div @mouseleave="hideFirst" @mouseenter="showFirst">
+        <h2 class="all">全部商品分类</h2>
+        <transition name='slide'>
+          <div class="sort" v-show='isShowFirst'>
+            <div class="all-sort-list2" @click='toSearch'>
+              <div class="item" v-for='(c1,index) in categoryList' :key="c1.categoryId" 
+              :class='{active:currentIndex===index}'
+              @mouseenter='showSubList(index)'>
+                <h3>
+                  <a href="javascript:;" :data-categoryName="c1.categoryName" :data-category1Id="c1.categoryId">{{c1.categoryName}}</a>
+                </h3>
+                <div class="item-list clearfix">
+                  <div class="subitem">
+                    <dl class="fore" v-for='c2 in c1.categoryChild' :key="c2.categoryId">
+                      <dt>
+                        <a href="javascript:;"  :data-categoryName="c2.categoryName" :data-category2Id="c2.categoryId">{{c2.categoryName}}</a>
+                      </dt>
+                      <dd>
+                        <em v-for='c3 in c2.categoryChild' :key="c3.categoryId">
+                        <a href="javascript:;"  :data-categoryName="c3.categoryName" :data-category3Id="c3.categoryId">{{c3.categoryName}}</a>
+                        </em>
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> 
+        </transition>
+      </div>
       <nav class="nav">
         <a href="###">服装城</a>
         <a href="###">美妆馆</a>
@@ -12,53 +41,35 @@
         <a href="###">有趣</a>
         <a href="###">秒杀</a>
       </nav>
-      <div class="sort" >
-        <div class="all-sort-list2" @click='toSearch'>
-          <div class="item" v-for='c1 in categoryList' :key="c1.categoryId">
-            <h3>
-              <!-- <a href="javascript:;" @click="$router.push(`/search?categoryName=${c1.categoryName}&category1Id=${c1.categoryId}`)">{{c1.categoryName}}</a> -->
-              <!-- <router-link :to="`/search?categoryName=${c1.categoryName}&category1Id=${c1.categoryId}`">{{c1.categoryName}}</router-link> -->
-              <a href="javascript:;" :data-categoryName="c1.categoryName" :data-category1Id="c1.categoryId">{{c1.categoryName}}</a>
-            </h3>
-            <div class="item-list clearfix">
-              <div class="subitem">
-                <dl class="fore" v-for='c2 in c1.categoryChild' :key="c2.categoryId">
-                  <dt>
-                    <!-- <a href="javascript:;" @click="$router.push(`/search?categoryName=${c2.categoryName}&category2Id=${c2.categoryId}`)">{{c2.categoryName}}</a> -->
-                    <!-- <router-link :to="`/search?categoryName=${c2.categoryName}&category2Id=${c2.categoryId}`">{{c2.categoryName}}</router-link> -->
-                    <a href="javascript:;"  :data-categoryName="c2.categoryName" :data-category2Id="c2.categoryId">{{c2.categoryName}}</a>
-                  </dt>
-                  <dd>
-                    <em v-for='c3 in c2.categoryChild' :key="c3.categoryId">
-                    <!-- <router-link :to="`/search?categoryName=${c3.categoryName}&category3Id=${c3.categoryId}`">{{c3.categoryName}}</router-link> -->
-                    <!-- <a href="javascript:;" @click="$router.push(`/search?categoryName=${c3.categoryName}&category3Id=${c3.categoryId}`)">{{c3.categoryName}}</a> -->
-                    <a href="javascript:;"  :data-categoryName="c3.categoryName" :data-category3Id="c3.categoryId">{{c3.categoryName}}</a>
-                    </em>
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
 
 <script>
 import {mapState} from 'vuex'
+// import _ from 'lodash'
+import throttle from 'lodash/throttle'
 export default {
   name: "TypeNav",
   computed:{
-    // categoryList(){
-    //   return this.$store.state.home.categoryList
-    // },
     ...mapState({
-      categoryList:state=>state.home.categoryList
-    })
+      categoryList:state=>state.home.categoryList//函数接收的是总状态，返回值作为计算属性
+    }),
   },
+  data(){
+      return{
+        currentIndex:-2,
+        isShowFirst:this.$route.path==='/'
+      }
+    },
   methods:{
-    // 使用代理模式
+    // 节流  showSubList最终执行的是节流后返回的函数 ,里面的回调其实还是一直在调用的
+    showSubList:throttle(function(index){
+      if(this.currentIndex!==-2){
+        this.currentIndex=index
+      }
+    },100),
+    // 使用代理模式 跳转search
     toSearch(event){
       const target = event.target
       const {categoryname,category1id,category2id,category3id} = target.dataset
@@ -74,12 +85,38 @@ export default {
         }else if(category3id){
           query.category3Id=category3id
         }
-        this.$router.push({
+        const location ={
           name:'search',
-          query
-        })
+          query,
+          params:this.$route.params //携带上params参数
+        }
+        // 跳转到search
+        if(this.$route.name==='search'){
+          this.$router.replace(location)
+        }else{
+          this.$router.push(location)
+        }
+        // 跳转后隐藏一级分类
+        this.hideFirst()
       }
       
+    },
+     
+    showFirst(){
+      // 光标移入整个div
+      this.currentIndex=-1
+      // 保证显示一级列表
+      this.isShowFirst=true
+    },
+    hideFirst(){
+      // 光标移入整个div
+      this.currentIndex=-2
+      // 需要判断当前是不是首页，如果是首页需要将isShowFirst设置为true
+      if(this.$route.path==='/'){
+        this.isShowFirst=true
+      }else{
+        this.isShowFirst=false
+      }
     }
   }
 };
@@ -125,6 +162,15 @@ export default {
       position: absolute;
       background: #fafafa;
       z-index: 999;
+      // 指定过渡时候的样式 样式名需要添加到sort上，所以使用&
+      &.slide-enter-active,&.slide-leave-active{
+        transition: all .5s;
+      }
+      // 指定隐藏时候的样式
+      &.slide-enter,&.slide-leave-to{
+        opacity: 0;
+        height: 0;
+      }
 
       .all-sort-list2 {
         .item {
@@ -195,7 +241,8 @@ export default {
             }
           }
 
-          &:hover {
+          &.active {
+            background-color: #333;
             .item-list {
               display: block;
             }

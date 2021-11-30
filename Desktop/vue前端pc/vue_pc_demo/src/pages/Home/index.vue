@@ -2,11 +2,11 @@
   <div>
     <TypeNav/>
     <ListContainer/>
-    <TodayRecommend/>
+    <TodayRecommend :recommendList='recommendList'/>
     <Rank/>
     <Like/>
     <Brand/>
-    <Floor/>
+    <Floor v-for='(item,index) in floorList' :key="index" :floor='item' />
   </div>
 </template>
 
@@ -17,7 +17,7 @@ import Like from '@/pages/Home/Like'
 import ListContainer from '@/pages/Home/ListContainer'
 import Rank from '@/pages/Home/Rank'
 import TodayRecommend from '@/pages/Home/TodayRecommend'
-
+import {mapState} from 'vuex'
 export default {
   name: 'Home',
   components:{
@@ -27,6 +27,19 @@ export default {
     ListContainer,
     Rank,
     TodayRecommend,
+  },
+  mounted(){
+    //获取recommend数据
+    this.$store.dispatch('getRecommendList')
+    // 获取floor数据
+    this.$store.dispatch('getFloorList')
+  },
+  computed:{
+    // 在home组件中接受数据，然后传递给子组件
+    ...mapState({
+      floorList:state=>state.home.floorList,
+      recommendList:state=>state.home.recommendList,
+    })
   }
 }
 </script>

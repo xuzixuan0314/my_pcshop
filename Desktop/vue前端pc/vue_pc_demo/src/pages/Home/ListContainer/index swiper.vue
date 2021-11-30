@@ -4,12 +4,23 @@
       <div class="center">
           <swiper ref="mySwiper" :options="swiperOptions">
             <swiper-slide v-for='banner in bannerList' :key="banner.id">
-                <img :src="banner.imageUrl" />
+              <img :src="banner.imageUrl" />
             </swiper-slide>
-            <div class="swiper-button-prev" slot="button-prev"></div>
-            <div class="swiper-button-next" slot="button-next"></div>
-            <div class="swiper-pagination" slot="pagination"></div>
+          <div class="swiper-pagination" slot="pagination"></div>
           </swiper>
+        <div class="swiper-container" ref='swiper'>
+          <div class="swiper-wrapper">
+            <div class="swiper-slide" v-for='banner in bannerList' :key="banner.id">
+              <img :src="banner.imageUrl" />
+            </div>
+          </div>
+          <!-- 如果需要分页器 -->
+          <div class="swiper-pagination"></div>
+          
+          <!-- 如果需要导航按钮 -->
+          <div class="swiper-button-prev"></div>
+          <div class="swiper-button-next"></div>
+        </div>
       </div>
       <div class="right">
         <div class="news"> 
@@ -85,14 +96,49 @@
 </template>
 
 <script>
+import Swiper from 'swiper'
 import 'swiper/css/swiper.css'
 import {mapState} from 'vuex'
 export default {
   name: "ListContainer",
-  data(){
-    return{
-      swiperOptions:{
-         loop: true, // 循环模式选项
+  mounted(){
+    // new Swiper 第一个参数是个选择器，第二个是传入一个配置对象
+    // new Swiper ('.swiper-container', {//直接使用这个类名的话会影响到页面其他同名的轮播
+  //   new Swiper (this.$refs.swiper, {//使用ref 
+  //   loop: true, // 循环模式选项
+    
+  //   // 如果需要分页器
+  //   pagination: {
+  //     el: '.swiper-pagination',
+  //   },
+    
+  //   // 如果需要前进后退按钮
+  //   navigation: {
+  //     nextEl: '.swiper-button-next',
+  //     prevEl: '.swiper-button-prev',
+  //   },
+  //   // 自动切换
+  //   autoplay:{
+  //     elay: 1000,//设置自动切换时间间隔
+  //     disableOnInteraction: false,//设置用户操作swiper后，是否禁止自动切换
+  //   }
+  // })        
+  },
+  computed:{
+    ...mapState({
+      bannerList:state=>state.home.bannerList
+    })
+  },
+  watch:{
+    bannerList(){
+      // 监控数据是否获取到了  
+      // 没有轮播效果是因为new Swiper太早了  需要在更新界面之后
+      // 在mounted阶段，异步数据刚发送，还没有回来
+      // 数据变化后-->同步调用监视的回调-->最后异步更新界面 
+      // $nextTick(callback)将回调延迟到下次DOM更新循环之后执行。在修改数据之后立即使用他，然后等待DOM更新
+      this.$nextTick(()=>{//在此次数据变化导致界面更新完成后执行回调
+        new Swiper (this.$refs.swiper, {//使用ref 
+          loop: true, // 循环模式选项
           // 如果需要分页器
           pagination: {
             el: '.swiper-pagination',
@@ -108,15 +154,10 @@ export default {
             elay: 1000,//设置自动切换时间间隔
             disableOnInteraction: false,//设置用户操作swiper后，是否禁止自动切换
           }
-      }
+        })  
+      })
     }
   },
-  computed:{
-    ...mapState({
-      bannerList:state=>state.home.bannerList
-    })
-  },
-
   
 };
 </script>

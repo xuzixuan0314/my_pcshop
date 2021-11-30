@@ -60,18 +60,29 @@ export default {
     // 所以可以将params和query的赋值定义在location外面，先判断当前是否是空串再传值
     // 在path路径的parmas的占位符后面加上一个？号表示这个参数可传可不传
       search(){
-
-
           const location={
               name:'search',
+              query:this.$route.query  //将当前就有的query参数携带上
           }
           if(this.keyword){
             location.params={keyword:this.keyword}
-            location.query={keyword2:this.keyword.toUpperCase()}
+            // location.query={keyword2:this.keyword.toUpperCase()}
           }
-          this.$router.push(location).catch(()=>{})
-          this.keyword=''
+          if(this.$route.name==='search'){
+            this.$router.replace(location).catch(()=>{})
+          }else{
+            this.$router.push(location).catch(()=>{})
+          }
       }
+  },
+  // 
+  mounted(){
+    this.$bus.$on('removeKeyword',()=>{
+      this.keyword=''
+    })
+  },
+  beforeDestroy(){
+    this.$bus.off('removeKeyword')
   }
 };
 </script>

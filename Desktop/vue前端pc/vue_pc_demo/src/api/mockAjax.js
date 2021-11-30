@@ -6,7 +6,7 @@ import 'nprogress/nprogress.css'
 
 // 配置通用的基础路径和超时时间
 const service = axios.create({
-    baseURL:'/api',
+    baseURL:'/mock',
     timeout:20000
 })
 

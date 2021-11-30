@@ -1,12 +1,16 @@
 const state={
-    userInfo:{}
+    userInfo:{
+    }
 }
-const mutations={}
-const actions={}
-const getters={}
+const mutations={
+}
 
+const actions ={
+}
 
-export default{
+const getters={
+}
+export default {
     state,
     mutations,
     actions,

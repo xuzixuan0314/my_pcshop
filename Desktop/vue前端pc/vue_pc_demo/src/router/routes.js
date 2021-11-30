@@ -13,36 +13,6 @@ export default [
     {
         path:'/',
         component:Home,
-        // children:[
-        //     {
-        //         path:'brand',
-        //         component:Brand
-        //     },
-        //     {
-        //         path:'floor',
-        //         component:Floor
-        //     },
-        //     {
-        //         path:'like',
-        //         component:Like
-        //     },
-        //     {
-        //         path:'listcontainer',
-        //         component:ListContainer
-        //     },
-        //     {
-        //         path:'rank',
-        //         component:Rank
-        //     },
-        //     {
-        //         path:'todayrecommend',
-        //         component:TodayRecommend
-        //     },
-        //     {
-        //         path:'typenav',
-        //         component:TypeNav
-        //     },
-        // ]
     },
     {
         path:'/login',
