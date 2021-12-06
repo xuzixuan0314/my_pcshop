@@ -5,15 +5,19 @@
       <div class="container">
         <div class="loginList">
           <p>尚品汇欢迎您！</p>
-          <p>
+          <p v-if='userInfo.name'>
+            <router-link to='/login'>{{userInfo.name}}</router-link>
+            <a href="javascript:;" class="register" @click="logOut">退出登录</a>
+          </p>
+          <p v-else>
             <span>请</span>
-            <a href="###">登录</a>
-            <a href="###" class="register">免费注册</a>
+            <router-link to='/login'>登录</router-link>
+            <router-link to='/register' class="register">免费注册</router-link>
           </p>
         </div>
         <div class="typeList">
-          <a href="###">我的订单</a>
-          <a href="###">我的购物车</a>
+          <router-link to='/center'>我的订单</router-link>
+          <router-link to='/shopCart'>我的购物车</router-link>
           <a href="###">我的尚品汇</a>
           <a href="###">尚品汇会员</a>
           <a href="###">企业采购</a>
@@ -48,6 +52,7 @@
 </template>
 
 <script>
+import {mapState} from 'vuex'
 export default {
   name: "Header",
   data(){
@@ -59,21 +64,36 @@ export default {
     // 采用编程式导航的时候，设置了params参数，如果不传入params参数会出问题
     // 所以可以将params和query的赋值定义在location外面，先判断当前是否是空串再传值
     // 在path路径的parmas的占位符后面加上一个？号表示这个参数可传可不传
-      search(){
-          const location={
-              name:'search',
-              query:this.$route.query  //将当前就有的query参数携带上
-          }
-          if(this.keyword){
-            location.params={keyword:this.keyword}
-            // location.query={keyword2:this.keyword.toUpperCase()}
-          }
-          if(this.$route.name==='search'){
-            this.$router.replace(location).catch(()=>{})
-          }else{
-            this.$router.push(location).catch(()=>{})
-          }
+    search(){
+      const location={
+          name:'search',
+          query:this.$route.query  //将当前就有的query参数携带上
       }
+      if(this.keyword){
+        location.params={keyword:this.keyword}
+        // location.query={keyword2:this.keyword.toUpperCase()}
+      }
+      if(this.$route.name==='search'){
+        this.$router.replace(location).catch(()=>{})
+      }else{
+        this.$router.push(location).catch(()=>{})
+      }
+    },
+    // 退出登录
+    async logOut(){
+
+      try {
+        await this.$store.dispatch('logOut')
+        this.$router.push('/')
+      } catch (error) {
+        alert(error.message)
+      }
+    }
+  },
+  computed:{
+    ...mapState({
+      userInfo:state=>state.user.userInfo
+    })
   },
   // 
   mounted(){

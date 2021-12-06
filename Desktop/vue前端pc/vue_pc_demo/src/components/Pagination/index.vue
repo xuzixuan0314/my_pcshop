@@ -19,7 +19,18 @@
 
 <script>
   export default {
-    name: "Pagination",
+    name: "MyPagination",
+    data(){
+      return {
+        // currentPageNum:this.currentPageNum
+      }
+    },
+    watch:{
+      currentPageNum(value){
+        this.currentPageNum=value
+      }
+    }
+    ,
     props:{
       total:Number,//总条数
       currentPageNum:{//当前页
@@ -28,7 +39,11 @@
       },
       pageSize:Number,//每页数量
       continueNum:{//连续显示数量
-        require:true
+        require:true,
+        // 要求值是奇数
+        validator:(value)=>{
+          return value%2===1
+        }
       }
     },
     computed:{

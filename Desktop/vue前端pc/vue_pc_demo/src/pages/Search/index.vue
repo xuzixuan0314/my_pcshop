@@ -54,7 +54,7 @@
               <li class="yui3-u-1-5" v-for='goods in goodsList' :key='goods.id'>
                 <div class="list-wrap">
                   <div class="p-img">
-                    <a href="javascript:;"><img :src="goods.defaultImg" /></a>
+                    <router-link :to="`/detail/${goods.id}`"><img v-lazy="goods.defaultImg" /></router-link>
                   </div>
                   <div class="price">
                     <strong>
@@ -63,7 +63,8 @@
                     </strong>
                   </div>
                   <div class="attr">
-                    <a href="javascript:;">{{goods.title}}</a> 
+                    <router-link :to="`/detail/${goods.id}`">{{goods.title}}</router-link>
+                    <!-- <a href="javascript:;">{{goods.title}}</a>  -->
                   </div>
                   <div class="commit">
                     <i class="command">已有<span>2000</span>人评价</i>
@@ -106,13 +107,13 @@
             </div>
           </div> -->
           <!-- total:总条数  currentPageNum：当前页  pageSize：每页条数  continueNum：连续数量 一般是奇数 -->
-          <Pagination
+          <MyPagination
             :total='searchList.total'
             :currentPageNum='options.pageNo'
             :pageSize='options.pageSize'
-            :continueNum='5'
+            :continueNum='3'
             @tabPage='tabPage'
-          ></Pagination>
+          ></MyPagination>
         </div>
       </div>
     </div>
@@ -135,8 +136,8 @@
           props:[],//商品属性的数组: ["属性ID:属性值:属性名"]示例: ["2:6.0～6.24英寸:屏幕尺寸"]
           trademark:'',//	品牌: "ID:品牌名称"示例: "1:苹果"
           order:'2:asc',//排序方式 1: 综合,2: 价格 asc: 升序,desc: 降序 示例: "1:desc"
-          pageNo:5,//页码
-          pageSize:1//数量
+          pageNo:1,//页码
+          pageSize:8//数量
         }
       }
     },
@@ -167,7 +168,8 @@
       },
       sortType(){
         return this.options.order.split(':')[1]
-      }
+      },
+      // 通过计算属性得到详情页路由跳转的params参数
     },
     methods:{
       // 更新options中的参数属性
@@ -193,12 +195,11 @@
       },
       // 获取商品列表的请求
       getShopList(){
-        
         this.$store.dispatch('getSearchList',this.options)
       },
       // 点击删除分类数据
       removeCategory(){
-        this.options.pageNo=1
+        this.options.pageNo=1 
         this.options.category1Id=''
         this.options.category2Id=''
         this.options.category3Id=''
@@ -208,7 +209,7 @@
           name:'search',
           params:this.$route.params
         })
-        // this.getShopList()
+        this.getShopList()
       },
       // 点击删除搜索的参数
       removeKeyword(){
@@ -219,7 +220,7 @@
           name:'search',
           query:this.$route.query
         })
-        // this.getShopList()
+        this.getShopList()
         this.$bus.$emit('removeKeyword')
       },
       // 分析：需要在父组件中使用函数发送请求，父亲想要孩子的数据

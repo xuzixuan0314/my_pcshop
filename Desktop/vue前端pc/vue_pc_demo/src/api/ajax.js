@@ -1,5 +1,6 @@
+// 引入store 以获取vuex中的数据
+import store from '@/store'
 import axios from 'axios'
-
 import NProgress from 'nprogress'
 // 需要手动引入样式
 import 'nprogress/nprogress.css'
@@ -14,6 +15,18 @@ const service = axios.create({
 service.interceptors.request.use((config)=>{
     // 请求拦截器是在请求将要发出的时候调用，在这里添加开始的进度条
     NProgress.start()
+    // 在请求拦截器中，给所有的请求头添加每个用户的临时的唯一标识
+    // 这个不是路由组件，而唯一标识在user的vuex中 所以引入总的仓库store 来获取
+    let userTempId = store.state.user.userTempId
+    if(userTempId){
+        config.headers.userTempId = userTempId
+    }
+    // 将token加入到请求头中
+    let token = store.state.user.token
+    if(token){
+        config.headers.token=token
+    }
+
     // 必须要将config返回，在里面对config进行操作后返回  后面会根据返回的config，使用xhr对象发送ajax请求
     return config
 },()=>{})//这里可以传入一个回调，不用也可以不传 一般不用
